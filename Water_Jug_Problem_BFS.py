@@ -8,6 +8,11 @@ def main():
     search(starting_node, jugs, goal_amount, check_dict)    #Calling search function with attributes
    
 
+def get_index(node):
+
+    return pow(7, node[0]) * pow(5, node[1])  #returns a key value for a given node
+
+
 def get_jugs():
     
     jugs = []   
@@ -36,6 +41,119 @@ def get_goal(jugs):
     return goal_amount              #Returns desired amount of water.
 
 
+def is_goal(path, goal_amount):         #In this function checking whether the goal is achieved
+
+    print("Checking if the gaol is achieved...")
+    
+    return path[-1][0] == goal_amount or path[-1][1] == goal_amount 
+
+
+def been_there(node, check_dict):    #This function will return True, if the given node is already visited
+    
+    print("Checking if {0} is visited before...".format(node))
+
+    return check_dict.get(get_index(node), False)
+
+
+def next_transitions(jugs, path, check_dict):  #This function will returns list of all possible transitions whcih do not cause loops
+
+    print("Finding next transitions and checking for the loops...")
+    
+    result = []
+    next_nodes = []
+    node = []
+    
+    a_max = jugs[0]
+    b_max = jugs[1]
+    
+    a = path[-1][0]  # initial amount in the first jug
+    b = path[-1][1]  # initial amount in the second jug
+
+    # 1. fill in the first jug
+    node.append(a_max)
+    node.append(b)
+    if not been_there(node, check_dict):
+        next_nodes.append(node)
+    node = []
+
+    # 2. fill in the second jug
+    node.append(a)
+    node.append(b_max)
+    if not been_there(node, check_dict):
+        next_nodes.append(node)
+    node = []
+
+    # 3. second jug to first jug
+    node.append(min(a_max, a + b))
+    node.append(b - (node[0] - a))  # b - ( a' - a)
+    if not been_there(node, check_dict):
+        next_nodes.append(node)
+    node = []
+
+    # 4. first jug to second jug
+    node.append(min(a + b, b_max))
+    node.insert(0, a - (node[0] - b))
+    if not been_there(node, check_dict):
+        next_nodes.append(node)
+    node = []
+
+    # 5. empty first jug
+    node.append(0)
+    node.append(b)
+    if not been_there(node, check_dict):
+        next_nodes.append(node)
+    node = []
+
+    # 6. empty second jug
+    node.append(a)
+    node.append(0)
+    if not been_there(node, check_dict):
+        next_nodes.append(node)
+
+    # create a list of next paths
+    for i in range(0, len(next_nodes)):
+        temp = list(path)
+        temp.append(next_nodes[i])
+        result.append(temp)
+
+    if len(next_nodes) == 0:        
+        print("No more unvisited nodes...\nBacktracking...")
+    else:
+        print("Possible transitions: ")
+        for nnode in next_nodes:
+            print(nnode)
+
+    return result     #Returns list of all possible transitions whcih do not cause loops
+
+
+def transition(old, new, jugs):   #returns a string explaining the transition from old state/node to new state/node
+    
+    a = old[0]         #old: a list representing old state/node
+    b = old[1]         
+    a_prime = new[0]    #new: a list representing new state/node
+    b_prime = new[1]    
+    a_max = jugs[0]     #jugs: a list of two integers representing volumes of the jugs
+    b_max = jugs[1]     
+
+    if a > a_prime:
+        if b == b_prime:
+            return "Removing {0}-liter jug:\t\t\t".format(a_max)
+        else:
+            return "Pour {0}-liter jug into {1}-liter jug:\t".format(a_max, b_max)
+    else:
+        if b > b_prime:
+            if a == a_prime:
+                return "Removing {0}-liter jug:\t\t\t".format(b_max)
+            else:
+                return "Pour {0}-liter jug into {1}-liter jug:\t".format(b_max, a_max)
+        else:
+            if a == a_prime:
+                return "Fill {0}-liter jug:\t\t\t".format(b_max)
+            else:
+                return "Fill {0}-liter jug:\t\t\t".format(a_max)
+
+
+
 def search(starting_node, jugs, goal_amount, check_dict):  #searching for a path between starting node and goal node
  
     goal = []
@@ -44,8 +162,19 @@ def search(starting_node, jugs, goal_amount, check_dict):  #searching for a path
     q = collections.deque()         #A deque is a double-ended queue. It can be used to add or remove elements from both ends.
     q.appendleft(starting_node)     #inserting the value in its argument to the left end of deque
     
-           
+    while len(q) != 0:              #while loop until number of objects in q = 0
+        path = q.popleft()          # to delete an argument from the left end of deque and assigning it
+        check_dict[get_index(path[-1])] = True  #storing the visited nodes
+        if len(path) >= 2:
+            print(transition(path[-2], path[-1], jugs), path[-1])       #Printing transition paths
+        if is_goal(path, goal_amount):      #Checking for the goal
+            accomplished = True
+            goal = path
+            break
 
+        next_moves = next_transitions(jugs, path, check_dict)       #Calling next_transitions function and assigning to next_moves
+        for i in next_moves:
+                q.append(i)
 
 
 
