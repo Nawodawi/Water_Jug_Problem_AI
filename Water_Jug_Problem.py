@@ -29,9 +29,35 @@ def getGCD(a, b):          #Calculating the gratest common divisor of vulumes of
         smaller = getGCD(larger - smaller, smaller)
     return smaller
 
+def makeMove(smaller, larger):        #actions to take according to the condition
+    
+    if smaller.is_empty():
+        smaller.fill()
+        print('A -> [', smaller.currentVol, ',', larger.currentVol,']')
+        return True
+  
+    if larger.is_full():
+        larger.dump()
+        print('B -> [', smaller.currentVol, ',', larger.currentVol,']')
+        return True
+
+    if not(smaller.is_empty()):
+        smaller.transfer(larger)
+        print('C -> [', smaller.currentVol, ',', larger.currentVol,']')
+        return True
+
 gcd = getGCD(smaller.capacity, larger.capacity)  #Assigning gcd
 
 if targetVolume % gcd != 0:                      #Checking for a exception
     print('No possible Solution with these volumes')
     sys.exit(0)   
 
+found_it = (smaller.currentVol + larger.currentVol) == targetVolume     
+step_count = 0
+
+while not(found_it):                            #While loop until find the solution
+    makeMove(smaller, larger)
+    step_count += 1
+    found_it = (smaller.currentVol + larger.currentVol) == targetVolume
+
+print('Found target volume in', step_count, 'steps')   #Printing the step count
