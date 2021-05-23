@@ -1,6 +1,5 @@
-import JugClass
+import JugClass      #importing the jug class
 import sys
-
 
 jugVolume1 = int(input('Jug 1 Volume:'), 10)     #getting user input for the volume of jug one
 jugVolume2 = int(input('Jug 2 Volume:'), 10)     ##getting user input for the volume of jug two
@@ -16,11 +15,11 @@ if targetVolume > jugVolume1 and targetVolume > jugVolume2:    #Target volume ca
     print('Target volume can\'t be larger than jug Volumes')
     sys.exit(1)
 
-
 smaller = JugClass.JugState(min(jugVolume1, jugVolume2), 'Jug 1')   #Assigning minimum volume jug as smaller
 
 
 larger = JugClass.JugState(max(jugVolume1, jugVolume2), 'Jug 2')    #Assigning maximum volume jug as larger
+
 
 def getGCD(a, b):          #Calculating the gratest common divisor of vulumes of two jugs
     larger = max(a, b)
@@ -28,6 +27,7 @@ def getGCD(a, b):          #Calculating the gratest common divisor of vulumes of
     if larger != smaller:
         smaller = getGCD(larger - smaller, smaller)
     return smaller
+
 
 def makeMove(smaller, larger):        #actions to take according to the condition
     
@@ -46,11 +46,12 @@ def makeMove(smaller, larger):        #actions to take according to the conditio
         print('C -> [', smaller.currentVol, ',', larger.currentVol,']')
         return True
 
+
 gcd = getGCD(smaller.capacity, larger.capacity)  #Assigning gcd
 
 if targetVolume % gcd != 0:                      #Checking for a exception
     print('No possible Solution with these volumes')
-    sys.exit(0)   
+    sys.exit(0)
 
 found_it = (smaller.currentVol + larger.currentVol) == targetVolume     
 step_count = 0
@@ -61,3 +62,5 @@ while not(found_it):                            #While loop until find the solut
     found_it = (smaller.currentVol + larger.currentVol) == targetVolume
 
 print('Found target volume in', step_count, 'steps')   #Printing the step count
+
+
