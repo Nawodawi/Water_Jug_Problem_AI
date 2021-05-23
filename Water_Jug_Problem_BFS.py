@@ -153,6 +153,12 @@ def transition(old, new, jugs):   #returns a string explaining the transition fr
                 return "Fill {0}-liter jug:\t\t\t".format(a_max)
 
 
+def print_path(path, jugs): #printing the goal path
+    
+    print("Starting from:\t\t\t\t", path[0])
+    for i in  range(0, len(path) - 1):
+        print(i+1,":", transition(path[i], path[i+1], jugs), path[i+1])                
+
 
 def search(starting_node, jugs, goal_amount, check_dict):  #searching for a path between starting node and goal node
  
@@ -175,6 +181,12 @@ def search(starting_node, jugs, goal_amount, check_dict):  #searching for a path
         next_moves = next_transitions(jugs, path, check_dict)       #Calling next_transitions function and assigning to next_moves
         for i in next_moves:
                 q.append(i)
+
+    if accomplished:            #Checking weather the goal is achieved
+        print("The goal is achieved\nPrinting the sequence of the moves...\n")
+        print_path(goal, jugs)
+    else:
+        print("Problem cannot be solved.")   #For example if jug 1 = 18L, jug 2 = 16L and when the target volume is 9 it can not be solved.             
 
 
 
